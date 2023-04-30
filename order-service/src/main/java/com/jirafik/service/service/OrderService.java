@@ -5,12 +5,14 @@ import com.jirafik.service.dto.OrderLineItemsDto;
 import com.jirafik.service.entity.Order;
 import com.jirafik.service.entity.OrderLineItems;
 import com.jirafik.service.entity.OrderRequest;
+import com.jirafik.service.event.OrderPlacedEvent;
 import com.jirafik.service.repository.OrderRepository;
 import io.micrometer.tracing.Span;
 import io.micrometer.tracing.Tracer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -29,6 +31,7 @@ public class OrderService {
     private final OrderRepository repository;
     private final WebClient.Builder webClientBuilder;
     private final Tracer tracer;
+    private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
     public String placeOrder(OrderRequest orderRequest) {
         log.info("--------------------------------Start method placeOrder");
@@ -67,6 +70,9 @@ public class OrderService {
 
             if (allProductsInStock && inventoryResponseArray.length != 0) {
                 repository.save(order);
+
+                kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
+
                 return "Order placed successfully";
             } else throw new IllegalArgumentException("Product is not in stock. Try again later");
 
