@@ -49,6 +49,7 @@ public class OrderService {
                 .stream()
                 .map(OrderLineItems::getSkuCode)
                 .toList();
+
         log.info("--------------------------------defined skuCodeList collection: {}", skuCodeList);
 
         Span inventoryServiceLookup = tracer.nextSpan().name("InventoryServiceLookup");
@@ -65,6 +66,7 @@ public class OrderService {
             log.info("--------------------------------defined InventoryResponse collection: {}",
                     Arrays.toString(inventoryResponseArray));
 
+            assert inventoryResponseArray != null;
             boolean allProductsInStock = Arrays.stream(inventoryResponseArray)
                     .allMatch(InventoryResponse::isInStock);
 

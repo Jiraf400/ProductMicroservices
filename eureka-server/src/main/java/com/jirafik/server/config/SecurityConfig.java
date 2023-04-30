@@ -25,11 +25,6 @@ public class SecurityConfig {
     @Value("${spring.security.user.password}")
     String password;
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-//        httpSecurity.csrf().ignoringRequestMatchers("/eureka/**");
-//        return httpSecurity.build();
-//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
