@@ -65,7 +65,6 @@
                             <goal>dockerBuild</goal>
                         </goals>
                     </execution>
-<!--                    dckr_pat_bK9RWfNxlaT44dlH_stbGJupo6E-->
                 </executions>
             </plugin>
         </plugins>
