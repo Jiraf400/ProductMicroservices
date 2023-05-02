@@ -51,17 +51,6 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-tracing-bridge-brave</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.zipkin.reporter2</groupId>
-            <artifactId>zipkin-reporter-brave</artifactId>
-        </dependency>
-
-
     </dependencies>
 
     <dependencyManagement>
@@ -75,5 +64,34 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+        <plugin>
+            <groupId>com.google.cloud.tools</groupId>
+            <artifactId>jib-maven-plugin</artifactId>
+            <version>3.2.1</version>
+            <configuration>
+                <container>
+                    <mainClass>com.jirafik.api.ApiGatewayApplication</mainClass>
+                </container>
+                <from>
+                    <image>eclipse-temurin:17.0.4.1_1-jre</image>
+                </from>
+                <to>
+                    <image>registry.hub.docker.com/jirafus400/${project.artifactId}</image>
+                </to>
+            </configuration>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>dockerBuild</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        </plugins>
+    </build>
 
 </project>
