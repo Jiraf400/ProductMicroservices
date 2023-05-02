@@ -70,9 +70,6 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
-                    <container>
-                        <mainClass>com.jirafik.server.EurekaServerApplication</mainClass>
-                    </container>
                     <from>
                         <image>eclipse-temurin:17.0.4.1_1-jre</image>
                     </from>

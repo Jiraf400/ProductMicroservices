@@ -35,6 +35,7 @@ services:
     environment:
       MYSQL_DB: order-service
       MYSQL_USER: javauser
+      MYSQL_ROOT_PASSWORD: javauser
       MYSQL_PASSWORD: javauser
       MYSQLDATA: /data/mysql
     volumes:
@@ -43,7 +44,7 @@ services:
       - "5431"
     ports:
       - "5431:5431"
-    command: -p 5431
+#    command: -p 5431
     restart: always
 
   mysql-inventory:
@@ -52,6 +53,7 @@ services:
     environment:
       MYSQL_DB: inventory-service
       MYSQL_USER: javauser
+      MYSQL_ROOT_PASSWORD: javauser
       MYSQL_PASSWORD: javauser
       MYSQLDATA: /data/mysql
     volumes:

@@ -7,11 +7,8 @@ import com.jirafik.service.entity.OrderLineItems;
 import com.jirafik.service.entity.OrderRequest;
 import com.jirafik.service.event.OrderPlacedEvent;
 import com.jirafik.service.repository.OrderRepository;
-import io.micrometer.tracing.Span;
-import io.micrometer.tracing.Tracer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +27,6 @@ public class OrderService {
 
     private final OrderRepository repository;
     private final WebClient.Builder webClientBuilder;
-    private final Tracer tracer;
     private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
     public String placeOrder(OrderRequest orderRequest) {
@@ -51,10 +47,6 @@ public class OrderService {
                 .toList();
 
         log.info("--------------------------------defined skuCodeList collection: {}", skuCodeList);
-
-        Span inventoryServiceLookup = tracer.nextSpan().name("InventoryServiceLookup");
-
-        try (Tracer.SpanInScope spanInScope = tracer.withSpan(inventoryServiceLookup.start())) {
 
             InventoryResponse[] inventoryResponseArray = webClientBuilder.build().get()
                     .uri("http://inventory-service/api/inventory",
@@ -78,9 +70,6 @@ public class OrderService {
                 return "Order placed successfully";
             } else throw new IllegalArgumentException("Product is not in stock. Try again later");
 
-        } finally {
-            inventoryServiceLookup.end();
-        }
 
 
     }
