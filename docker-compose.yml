@@ -1,72 +1,42 @@
 ---
-version: '3'
+version: '3.7'
 services:
-
-  ## Kafka
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.0.1
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
-  broker:
-    image: confluentinc/cp-kafka:7.0.1
-    container_name: broker
-    ports:
-      - "9092:9092"
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-
   ## MySQL Docker Compose Config
-  mysql-order:
-    container_name: mysql-order
-    image: mysql
+  postgres-order:
+    container_name: postgres-order
+    image: postgres
     environment:
-      MYSQL_DB: order-service
-      MYSQL_USER: javauser
-      MYSQL_ROOT_PASSWORD: javauser
-      MYSQL_PASSWORD: javauser
-      MYSQLDATA: /data/mysql
+      POSTGRES_DB: order-service
+      POSTGRES_USER: ptechie
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
     volumes:
-      - ./mysql-order:/data/mysql
+      - ./postgres-order:/data/postgres
     expose:
       - "5431"
     ports:
       - "5431:5431"
-#    command: -p 5431
+    command: -p 5431
     restart: always
 
-  mysql-inventory:
-    container_name: mysql-inventory
-    image: mysql
+  postgres-inventory:
+    container_name: postgres-inventory
+    image: postgres
     environment:
-      MYSQL_DB: inventory-service
-      MYSQL_USER: javauser
-      MYSQL_ROOT_PASSWORD: javauser
-      MYSQL_PASSWORD: javauser
-      MYSQLDATA: /data/mysql
+      POSTGRES_DB: inventory-service
+      POSTGRES_USER: ptechie
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
     volumes:
-      - ./mysql-inventory:/data/mysql
+      - ./postgres-inventory:/data/postgres
     ports:
       - "5432:5432"
     restart: always
 
-
   ## Mongo Docker Compose Config
   mongo:
     container_name: mongo
-    image: mongo
+    image: mongo:4.4.14-rc0-focal
     restart: always
     ports:
       - "27017:27017"
@@ -74,7 +44,6 @@ services:
       - "27017"
     volumes:
       - ./mongo-data:/data/db
-
 
   ## Keycloak Config with Mysql database
   keycloak-mysql:
@@ -107,6 +76,31 @@ services:
     depends_on:
       - keycloak-mysql
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  broker:
+    image: confluentinc/cp-kafka:7.0.1
+    container_name: broker
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
 
   ## Eureka Server
   eureka-server:
@@ -116,7 +110,6 @@ services:
       - "8761:8761"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-
 
   api-gateway:
     image: jirafus400/api-gateway:latest
@@ -149,9 +142,9 @@ services:
     image: jirafus400/order-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-order:5431/order-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-order:5431/order-service
     depends_on:
-      - mysql-order
+      - postgres-order
       - broker
       - eureka-server
       - api-gateway
@@ -162,9 +155,9 @@ services:
     image: jirafus400/inventory-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-inventory:5432/inventory-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-inventory:5432/inventory-service
     depends_on:
-      - mysql-inventory
+      - postgres-inventory
       - eureka-server
       - api-gateway
 
@@ -178,3 +171,4 @@ services:
       - broker
       - eureka-server
       - api-gateway
+
