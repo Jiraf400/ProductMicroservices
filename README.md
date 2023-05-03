@@ -17,9 +17,9 @@ Order, Inventory and Notification Services interact with each other.
 
 STACK: 
 
-Kafka 
-KeyCloak 
-Resilience4j
+Kafka, 
+KeyCloak,
+Resilience4j,
 Mongodb, Mysql
 
 
