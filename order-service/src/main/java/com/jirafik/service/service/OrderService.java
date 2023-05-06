@@ -70,8 +70,6 @@ public class OrderService {
                 return "Order placed successfully";
             } else throw new IllegalArgumentException("Product is not in stock. Try again later");
 
-
-
     }
 
     private OrderLineItems mapToDto(OrderLineItemsDto dto) {

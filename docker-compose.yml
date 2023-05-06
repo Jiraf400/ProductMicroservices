@@ -2,13 +2,27 @@
 version: '3.7'
 services:
   ## MySQL Docker Compose Config
+  postgres-product:
+    image: postgres
+    container_name: postgres-product
+    environment:
+      POSTGRES_DB: product-service
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      GDATA: /data/postgres
+    volumes:
+      - ./postgres-product:/data/postgres
+    ports:
+      - "5433:5433"
+    restart: always
+
   postgres-order:
     container_name: postgres-order
     image: postgres
     environment:
       POSTGRES_DB: order-service
-      POSTGRES_USER: ptechie
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
       PGDATA: /data/postgres
     volumes:
       - ./postgres-order:/data/postgres
@@ -16,7 +30,6 @@ services:
       - "5431"
     ports:
       - "5431:5431"
-    command: -p 5431
     restart: always
 
   postgres-inventory:
@@ -24,8 +37,8 @@ services:
     image: postgres
     environment:
       POSTGRES_DB: inventory-service
-      POSTGRES_USER: ptechie
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
       PGDATA: /data/postgres
     volumes:
       - ./postgres-inventory:/data/postgres
@@ -33,17 +46,7 @@ services:
       - "5432:5432"
     restart: always
 
-  ## Mongo Docker Compose Config
-  mongo:
-    container_name: mongo
-    image: mongo:4.4.14-rc0-focal
-    restart: always
-    ports:
-      - "27017:27017"
-    expose:
-      - "27017"
-    volumes:
-      - ./mongo-data:/data/db
+
 
   ## Keycloak Config with Mysql database
   keycloak-mysql:
@@ -104,7 +107,7 @@ services:
 
   ## Eureka Server
   eureka-server:
-    image: jirafus400/eureka-server:latest
+    image: registry.hub.docker.com/jirafus400/eureka-server:latest
     container_name: eureka-server
     ports:
       - "8761:8761"
@@ -112,7 +115,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
 
   api-gateway:
-    image: jirafus400/api-gateway:latest
+    image: registry.hub.docker.com/jirafus400/api-gateway:latest
     container_name: api-gateway
     ports:
       - "8181:8080"
@@ -128,18 +131,19 @@ services:
   ## Product-Service Docker Compose Config
   product-service:
     container_name: product-service
-    image: jirafus400/product-service:latest
+    image: registry.hub.docker.com/jirafus400/product-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-product:5433/product-service
     depends_on:
-      - mongo
+      - postgres-product
       - eureka-server
       - api-gateway
 
   ## Order-Service Docker Compose Config
   order-service:
     container_name: order-service
-    image: jirafus400/order-service:latest
+    image: registry.hub.docker.com/jirafus400/order-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-order:5431/order-service
@@ -152,7 +156,7 @@ services:
   ## Inventory-Service Docker Compose Config
   inventory-service:
     container_name: inventory-service
-    image: jirafus400/inventory-service:latest
+    image: registry.hub.docker.com/jirafus400/inventory-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-inventory:5432/inventory-service
@@ -164,7 +168,7 @@ services:
   ## Notification-Service Docker Compose Config
   notification-service:
     container_name: notification-service
-    image: jirafus400/notification-service:latest
+    image: registry.hub.docker.com/jirafus400/notification-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
