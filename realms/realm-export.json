@@ -1884,7 +1884,8 @@
     "oauth2DeviceCodeLifespan": "600",
     "oauth2DevicePollingInterval": "5",
     "parRequestUriLifespan": "60",
-    "cibaInterval": "5"
+    "cibaInterval": "5",
+    "": ""
   },
   "keycloakVersion": "18.0.0",
   "userManagedAccessAllowed": false,
