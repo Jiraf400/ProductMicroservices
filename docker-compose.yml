@@ -1,5 +1,5 @@
 ---
-version: '3.7'
+version: '3.8'
 services:
   ## MySQL Docker Compose Config
   postgres-product:
@@ -7,29 +7,16 @@ services:
     container_name: postgres-product
     environment:
       POSTGRES_DB: product-service
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "password"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
       GDATA: /data/postgres
     volumes:
       - ./postgres-product:/data/postgres
     ports:
       - "5433:5433"
-    restart: always
-
-  postgres-order:
-    container_name: postgres-order
-    image: postgres
-    environment:
-      POSTGRES_DB: order-service
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "password"
-      PGDATA: /data/postgres
-    volumes:
-      - ./postgres-order:/data/postgres
+    command: -p 5433
     expose:
-      - "5431"
-    ports:
-      - "5431:5431"
+      - "5433"
     restart: always
 
   postgres-inventory:
@@ -37,8 +24,8 @@ services:
     image: postgres
     environment:
       POSTGRES_DB: inventory-service
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "password"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
       PGDATA: /data/postgres
     volumes:
       - ./postgres-inventory:/data/postgres
@@ -46,7 +33,22 @@ services:
       - "5432:5432"
     restart: always
 
-
+  postgres-order:
+    container_name: postgres-order
+    image: postgres
+    environment:
+      POSTGRES_DB: order_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres-order:/data/postgres
+    ports:
+      - "5431:5431"
+    command: -p 5431
+    expose:
+      - "5431"
+    restart: always
 
   ## Keycloak Config with Mysql database
   keycloak-mysql:
@@ -104,7 +106,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
-
   ## Eureka Server
   eureka-server:
     image: registry.hub.docker.com/jirafus400/eureka-server:latest
@@ -128,7 +129,7 @@ services:
       - eureka-server
       - keycloak
 
-  ## Product-Service Docker Compose Config
+    ## Product-Service Docker Compose Config
   product-service:
     container_name: product-service
     image: registry.hub.docker.com/jirafus400/product-service:latest
@@ -140,20 +141,22 @@ services:
       - eureka-server
       - api-gateway
 
+
   ## Order-Service Docker Compose Config
   order-service:
     container_name: order-service
     image: registry.hub.docker.com/jirafus400/order-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-order:5431/order-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-order:5431/order_service
     depends_on:
       - postgres-order
       - broker
       - eureka-server
       - api-gateway
 
-  ## Inventory-Service Docker Compose Config
+
+    ## Inventory-Service Docker Compose Config
   inventory-service:
     container_name: inventory-service
     image: registry.hub.docker.com/jirafus400/inventory-service:latest

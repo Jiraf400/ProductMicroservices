@@ -1,13 +1,13 @@
 # ProductMicroservices
 SpringBoot Microservices project
 
-Builded services:
+Built services:
 
 Product Service - simple service to view products. Uses mongo as database;
 
 Order Service - can order products
 
-Inventory Service - can chech if product, that will be ordered by order service, is in stock or not
+Inventory Service - can check if product, that will be ordered by order service, is in stock or not
 
 Notification Service - Can send notifications, after orders is placed.
 
