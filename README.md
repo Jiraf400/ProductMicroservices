@@ -11,9 +11,7 @@ Inventory Service - can check if product, that will be ordered by order service,
 
 Notification Service - Can send notifications, after orders is placed.
 
-
-Order, Inventory and Notification Services interact with each other.  
-
+Order, Inventory and Notification Services interact with each other.
 
 STACK: 
 
